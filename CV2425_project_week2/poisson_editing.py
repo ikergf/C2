@@ -11,11 +11,11 @@ def im_fwd_gradient(image: np.ndarray):
 
     # Forward difference for vertical gradient (axis 0)
     grad_i[:-1, :] = image[1:, :] - image[:-1, :]
-    grad_i[0, :] = image[0, :]  # Handle boundary
+    # grad_i[0, :] = image[0, :]  # Handle boundary
     
     # Forward difference for horizontal gradient (axis 1)
     grad_j[:, :-1] = image[:, 1:] - image[:, :-1]
-    grad_j[0, :] = image[:, 0]  # Handle boundary
+    # grad_j[0, :] = image[:, 0]  # Handle boundary
 
     return grad_i, grad_j
 
@@ -30,11 +30,11 @@ def im_bwd_divergence(im1: np.ndarray, im2: np.ndarray):
 
     # Backward difference for vertical divergence (axis 0)
     div_i[1:, :] = im1[1:, :] - im1[:-1, :]
-    div_i[0, :] = im1[0, :]  # Handle boundary
+    # div_i[0, :] = im1[0, :]  # Handle boundary
     
     # Backward difference for horizontal divergence (axis 1)
     div_j[:, 1:] = im2[:, 1:] - im2[:, :-1]
-    div_j[:, 0] = im2[:, 0]  # Handle boundary
+    # div_j[:, 0] = im2[:, 0]  # Handle boundary
 
     return div_i + div_j
 

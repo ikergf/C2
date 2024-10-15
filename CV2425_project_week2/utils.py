@@ -14,17 +14,25 @@ def shift_image(src, mask, translation):
 
     return shifted_src, shifted_mask
 
-def combine_sources_with_masks(src, src2, dst, mask_shifted_eyes, mask_shifted_mouth):
+def combine_sources_with_masks(src, dst, mask):
 
-    # Combine masks by taking the maximum (union of both masks)
-    combined_mask = np.maximum(mask_shifted_eyes, mask_shifted_mouth)
+    if len(mask)>1:
+        # Combine masks by taking the maximum (union of both masks)
+        combined_mask = np.maximum(mask[0], mask[1])
+        print('a')
+    else:
+        combined_mask = mask[0]
 
     # Initialize combined image with destination as the background
     combined_src = np.copy(dst)
+    print(src[0].shape)
 
     # For each channel, apply the source image only where the mask is active
     for i in range(3):  # Loop over RGB channels
-        combined_src[:, :, i] = np.where(mask_shifted_eyes[:, :, i] > 0, src[:, :, i], combined_src[:, :, i])
-        combined_src[:, :, i] = np.where(mask_shifted_mouth[:, :, i] > 0, src2[:, :, i], combined_src[:, :, i])
+        if len(src)>1:
+            combined_src[:, :, i] = np.where(mask[0][:, :, i] > 0, src[0][:, :, i], combined_src[:, :, i])
+            combined_src[:, :, i] = np.where(mask[1][:, :, i] > 0, src[1][:, :, i], combined_src[:, :, i])
+        else:
+            combined_src[:, :, i] = np.where(mask[0][:, :, i] > 0, src[0][:, :, i], combined_src[:, :, i])
 
     return combined_src, combined_mask

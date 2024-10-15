@@ -8,7 +8,7 @@ class Parameters:
     hi: float
     hj: float
 
-def laplace_equation(f, mask, grads, param):
+def laplace_equation(f, mask, grads, beta, dst, param):
 
     ni = f.shape[0] #Number of rows
     nj = f.shape[1] #Number of columns
@@ -21,6 +21,8 @@ def laplace_equation(f, mask, grads, param):
     nPixels = ni*nj # Number of pixels
 
     b = np.zeros(nPixels, dtype=float)
+
+    beta = beta.reshape(-1, order='F')
 
     # Vector counter
     idx=0
@@ -112,35 +114,35 @@ def laplace_equation(f, mask, grads, param):
                 # COMPLETE THE CODE
                 idx_Ai.insert(idx, p)
                 idx_Aj.insert(idx, p)
-                a_ij.insert(idx, 4)  # Laplace operator central term
+                a_ij.insert(idx,  4)  # Laplace operator central term
                 idx += 1
 
                 # Link to north neighbor
                 idx_Ai.insert(idx, p)
                 idx_Aj.insert(idx, p + 1)
-                a_ij.insert(idx, -1)
+                a_ij.insert(idx,  -1)
                 idx += 1
 
                 # Link to south neighbor
                 idx_Ai.insert(idx, p)
                 idx_Aj.insert(idx, p - 1)
-                a_ij.insert(idx, -1)
+                a_ij.insert(idx,  -1)
                 idx += 1
 
                 # Link to west neighbor
                 idx_Ai.insert(idx, p)
                 idx_Aj.insert(idx, p + (ni))
-                a_ij.insert(idx, -1)
+                a_ij.insert(idx,  -1)
                 idx += 1
 
                 # Link to east neighbor
                 idx_Ai.insert(idx, p)
                 idx_Aj.insert(idx, p - (ni))
-                a_ij.insert(idx, -1)
+                a_ij.insert(idx,  -1)
                 idx += 1
 
                 # Right-hand side of the equation
-                b[p] = -grads[i,j]  # In-painting
+                b[p] =  -grads[i,j]  # In-painting
 
             else: # we do not have to in-paint this pixel
 
@@ -148,10 +150,10 @@ def laplace_equation(f, mask, grads, param):
                 # COMPLETE THE CODE
                 idx_Ai.insert(idx, p)
                 idx_Aj.insert(idx, p)
-                a_ij.insert(idx, 1)
+                a_ij.insert(idx, beta[p])
                 idx += 1
 
-                b[p] = f_ext[i, j]  # Keep the original value
+                b[p] = beta[p]*f_ext[i, j]  # Keep the original value
 
     idx_Ai_c = idx_Ai
     idx_Aj_c = idx_Aj
