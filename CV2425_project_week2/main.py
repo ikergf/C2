@@ -11,7 +11,7 @@ class Parameters:
     hi: float
     hj: float
 
-case = 'monalisa_custom'
+case = 'monalisa'
 
 if case == 'lena':
     # Load images
@@ -26,9 +26,14 @@ elif case == 'monalisa_custom':
     src = cv2.imread('images/monalisa/ginevra.png')
     dst = cv2.imread('images/monalisa/lisa.png')
 elif case == 'lena_custom':
-    # For Mona Lisa and Ginevra:
-    src = cv2.imread('images/monalisa/ginevra.png')
-    dst = cv2.imread('images/monalisa/lisa.png')
+    src = cv2.imread('images/lena/girl.png')
+    dst = cv2.imread('images/lena/lena.png')
+elif case == 'madrid':
+    src = cv2.imread('images/madrid/madrid1.jfif')
+    dst = cv2.imread('images/madrid/madrid2.jpg')
+elif case == 'dolphin':
+    src = cv2.imread('images/dolphin/dolphin1.jpg')
+    dst = cv2.imread('images/dolphin/dolphin2.jpg')
 else:
     pass
 
@@ -44,16 +49,22 @@ max_val = np.max(dst)
 im = (dst.astype('float') - min_val)
 dst = im / max_val
 
+padding = False
+
+if src.shape != dst.shape:
+    org_shape = dst.shape[:2]
+    src, dst = match_image_sizes(src, dst)
+    padding = True
+
+src_masks = []
+dst_masks = []
+
 # Store shapes and number of channels (src, dst and mask should have same dimensions!)
 ni, nj, nChannels = dst.shape
 
 # Display the images
 #cv2.imshow('Source image', src); cv2.waitKey(0)
 #cv2.imshow('Destination image', dst); cv2.waitKey(0)
-
-src_masks = []
-dst_masks = []
-
 
 if case == 'lena':
     # Load masks for eye swapping
@@ -151,8 +162,18 @@ for channel in range(3):
     x = inpainting.laplace_equation(u, m, b, beta, f, param)
 
     u_comb[:, :, channel] = x
-    
-#cv2.imshow('Final result of Poisson blending', u_comb)
-#cv2.waitKey(0)
-cv2.imwrite('./results/'+case + '_result.png', cv2.normalize(u_comb, None, 0, 255, cv2.NORM_MINMAX).astype('uint8'))
+
+if padding:
+    u_comb = remove_padding(u_comb, org_shape)
+
+u_comb = cv2.normalize(u_comb, None, 0, 255, cv2.NORM_MINMAX).astype('uint8')
+
+#zscore_image = (u_comb - np.mean(u_comb)) / np.std(u_comb)
+#zscore_normalized = ((zscore_image - np.min(zscore_image)) / (np.max(zscore_image) - np.min(zscore_image)) * 255).astype('uint8')
+
+cv2.imshow('Final result of Poisson blending', u_comb)
+cv2.waitKey(0)
+
+cv2.imwrite('./results/'+case + '_result.png', u_comb)
+
 print("FINISHED")

@@ -46,3 +46,22 @@ def combine_sources_with_masks(src, dst, mask):
             combined_src[:, :, i] = np.where(mask[0] > 0, src[0][:, :, i], combined_src[:, :, i])
 
     return combined_src, combined_mask
+
+def match_image_sizes(img1, img2):
+    h1, w1 = img1.shape[:2]
+    h2, w2 = img2.shape[:2]
+    
+    max_height = max(h1, h2)
+    max_width = max(w1, w2)
+    
+    img1_padded = np.zeros((max_height, max_width, 3))
+    img2_padded = np.zeros((max_height, max_width, 3))
+    
+    img1_padded[:h1, :w1] = img1
+    img2_padded[:h2, :w2] = img2
+    
+    return img1_padded, img2_padded
+
+def remove_padding(img_padded, size):
+    h, w = size
+    return img_padded[:h, :w]
