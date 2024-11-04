@@ -7,7 +7,6 @@ folderInput = 'images/'
 figure_name = 'phantom3.bmp'
 figure_name_final = folderInput + figure_name
 img = cv2.imread(figure_name_final, cv2.IMREAD_UNCHANGED)
-pattern = 'circle' #checkboard or circle
 
 # Visualize the grayscale image
 # cv2.imshow('Image', img); cv2.waitKey(0)
@@ -35,6 +34,7 @@ lambda2 = 1.0
 tol = 10e-3
 dt = 0.5
 iterMax = 30000
+pattern = 'circle' #checkboard or circle
 
 X, Y = np.meshgrid(np.arange(0, nj), np.arange(0, ni), indexing='xy')
 
